@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.3.xsd
+	">
+	
+	<!-- 开启注解 -->
+	<context:annotation-config/>
+	<!-- 设置扫描范围 -->
+	<context:component-scan base-package="com.market"/>
+	<!-- 设置自动代理 -->
+	<aop:aspectj-autoproxy/>
+	
+	<!-- 创建数据源(c3p0)-->
+	 <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl"
+		value="jdbc:mysql://localhost:3306/market?useUnicode=true&amp;characterEncoding=utf8" />
+		<property name="user" value="root" />
+		<property name="password" value="123456"/>
+	 </bean>
+
+ 	 <!-- 配置SessionFactory -->
+ 	 <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<!-- 注入数据源 -->
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 配置hibernate参数 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate5.SpringSessionContext</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.fetch_size">50</prop>
+			</props>
+		</property>
+		<!--扫描注解文件-->
+		<property name="packagesToScan" value="com.market.entity"/>
+	 </bean>
+	 
+	 <!-- 声明式事物管理 -->
+	 <bean id="tm" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+	 	<property name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	 <!-- 开启声明式事务注解 -->
+	 <tx:annotation-driven transaction-manager="tm"/>
+	 
+</beans>
+
+
+
+
+
+
+
